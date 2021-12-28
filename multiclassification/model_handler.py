@@ -12,6 +12,7 @@ import numpy as np
 import torch
 import librosa
 
+AUDIO_EXTENSIONS = ["mp4", "mp3", "aac", "m4a", "wav", "flac"] 
 
 class ModelHandler(object):
     """
@@ -77,15 +78,19 @@ class ModelHandler(object):
         try:
             # read b64 encoded audio file 
             json_str = body.decode('utf8').replace("'", '"')
-            audio_b64 = json.loads(json_str)['audio']
+            data = json.loads(json_str)
+            audio_b64 = data['audio']
+            ext = data['ext']
+            if ext not in AUDIO_EXTENSIONS:
+                raise ValueError(f"Got extension {ext} which is not part of {AUDIO_EXTENSIONS}")
     
             # save audio file
             audio_file = base64.b64decode(audio_b64)
-            with open("/tmp/audio.m4a", "wb+") as f:
+            with open(f"/tmp/audio.{ext}", "wb+") as f:
                 f.write(audio_file)
 
             # load as numpy arr
-            audio_arr, _ = librosa.core.load("/tmp/audio.m4a", sr=32000, mono=True)
+            audio_arr, _ = librosa.core.load(f"/tmp/audio.{ext}", sr=32000, mono=True)
 
             return torch.FloatTensor(audio_arr).reshape([1, -1])
         except Exception as e:
