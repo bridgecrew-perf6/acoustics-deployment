@@ -1,5 +1,3 @@
-
-   
 FROM ubuntu:18.04
 
 # Set a docker label to advertise multi-model support on the container
@@ -32,7 +30,8 @@ RUN pip3 --no-cache-dir install mxnet \
                                 retrying \
                                 torch \ 
                                 torchlibrosa \
-                                librosa
+                                librosa \
+                                matplotlib 
 
 # Copy entrypoint script to the image
 COPY dockerd-entrypoint.py /usr/local/bin/dockerd-entrypoint.py
